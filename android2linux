@@ -1,0 +1,20 @@
+#!/bin/bash
+# Check if this is the 1st time for mobile connected at pc
+read ipaddress < ipaddress.txt
+if [ "$ipaddress" = "" ]; then
+	#Setup for 1st time connection
+	ipaddress=$(zenity --width 300 --height 100 --entry --title "test
+	Screen Cast Android 2 Linux" --text="`printf "Δώσε την διεύθυνση διαδικτυακού πρωτοκόλλου από το κινητό σου τηλέφωνο:\n Input the ip address from your smartphone:"`" --entry-text=xxx.xxx.xxx.xxx)
+	echo $ipaddress > ipaddress.txt
+	adb start-server
+	adb connect $ipaddress:5555
+	# scrcpy
+else
+	#Setup after 1st time connection
+	adb start-server
+	# read ipaddress < ipaddress.txt
+	adb connect $ipaddress:5555
+	# scrcpy	
+fi
+# Run application scrcpy
+scrcpy
