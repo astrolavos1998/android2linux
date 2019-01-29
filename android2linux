@@ -5,18 +5,34 @@
 # Thank you Genymobile
 # ************************************
 # Check if this is the 1st time for mobile connected at pc
-read ipaddress < ipaddress.txt
-if [ "$ipaddress" = "" ]; then
+
+# Έλεγχος για ύπαρξη του strcpy, αλλιώς τερματίζει το script
+scrcpy_installed=$(command -v strcpy 2>/dev/null || echo FALSE)
+if [ "$scrcpy_installed" == "FALSE" ]; then
+	echo "Δεν είναι εγκατεστημένο το scrcpy"
+	echo "Εγκαταστήστε το scrcpy"
+	exit 0
+fi
+
+# Έλεγχος για ύπαρξη του adb, αλλιώς τερματίζει το script
+adb_installed=$(command -v adb 2>/dev/null || echo FALSE)
+if [ "$adb_installed" == "FALSE" ]; then
+	echo "Δεν είναι εγκατεστημένο το adb"
+	echo "Εγκαταστήστε τα android-tools"
+	exit 0
+fi
+
+read -r ipaddress < ipaddress.txt
+if [ -z "$ipaddress" ]; then
 	#Setup for 1st time connection
-	ipaddress=$(zenity --width 300 --height 100 --entry --title "test
-	Screen Cast Android 2 Linux" --text="`printf "Δώσε την διεύθυνση διαδικτυακού πρωτοκόλλου από το κινητό σου τηλέφωνο:\n Input the ip address from your smartphone:"`" --entry-text=xxx.xxx.xxx.xxx)
-	echo $ipaddress > ipaddress.txt
+	ipaddress=$(zenity --width 300 --height 100 --entry --title "test Screen Cast Android 2 Linux" --text="$(printf "Δώσε την διεύθυνση διαδικτυακού πρωτοκόλλου από το κινητό σου τηλέφωνο:\n Input the ip address from your smartphone:")" --entry-text=xxx.xxx.xxx.xxx)
+	echo "$ipaddress" > ipaddress.txt
 	adb start-server
-	adb connect $ipaddress:5555
+	adb connect "$ipaddress":5555
 else
 	#Setup after 1st time connection
 	adb start-server
-	adb connect $ipaddress:5555
+	adb connect "$ipaddress":5555
 fi
 # Run application scrcpy
 scrcpy
